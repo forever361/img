@@ -1,0 +1,373 @@
+##################################################################################
+### VENDOR_EDIT, OPPO All rights reserved.
+###
+### File: - init.oppo.debug.nosd.rc
+### Author: Jason.Lee@OnlineRd.Framework
+###
+### ------------------------------- Revision History: ----------------------------
+### <author>                        <data>       <version>   <desc>
+### ------------------------------------------------------------------------------
+### Jason.Lee@OnlineRd.Framework   2014-03-18               Create this file
+##################################################################################
+
+#ifdef VENDOR_EDIT
+#yanbin@OnlineRd.framework.oppo_debug, 2015/03/07, add
+
+# There are some duplicate codes
+
+on property:persist.sys.dump=1
+    write /sys/module/msm_poweroff/parameters/download_mode  1
+#a506_zap
+    write /sys/bus/msm_subsys/devices/subsys0/restart_level system
+#venus
+    write /sys/bus/msm_subsys/devices/subsys1/restart_level system
+#adsp
+    write /sys/bus/msm_subsys/devices/subsys2/restart_level system
+#wcnss
+    write /sys/bus/msm_subsys/devices/subsys3/restart_level system
+#ifdef VENDOR_EDIT
+#modem
+#zhaokai@Network.modem,2016/08/01,add for modem subsystem
+    write /sys/bus/msm_subsys/devices/subsys4/restart_level system
+#endif
+# modify shirendong 2016/01/11 for disable console log default
+    write /proc/sys/kernel/printk "1 6 1 7"
+on property:persist.sys.dump=0
+    write /sys/module/msm_poweroff/parameters/download_mode  0
+#a506_zap
+    write /sys/bus/msm_subsys/devices/subsys0/restart_level related
+#venus
+    write /sys/bus/msm_subsys/devices/subsys1/restart_level related
+#adsp
+    write /sys/bus/msm_subsys/devices/subsys2/restart_level related
+#wcnss
+    write /sys/bus/msm_subsys/devices/subsys3/restart_level related
+#ifdef VENDOR_EDIT
+#modem
+#zhaokai@Network.modem,2016/08/01,add for modem subsystem
+    write /sys/bus/msm_subsys/devices/subsys4/restart_level related
+#endif
+    write /proc/sys/kernel/printk "1 6 1 7"
+
+#JianRong.Zheng@Swdp.Android.Log, 2016/10/07, modify 0x840 from 0x0c to 0x0F, 0x841 from 0x07 to 0x05 avoid cause into dump by mistake(5.5s change to 10.7s)
+on property:persist.sys.powerkeydump=1
+    write  /d/spmi/spmi-0/address 0x843
+    write  /d/spmi/spmi-0/data 0x80
+    write  /d/spmi/spmi-0/address 0x842
+    write  /d/spmi/spmi-0/data 0x01
+    write  /d/spmi/spmi-0/address 0x840
+    write  /d/spmi/spmi-0/data 0x0F
+    write  /d/spmi/spmi-0/address 0x841
+    write  /d/spmi/spmi-0/data 0x05
+
+#JianRong.Zheng@Swdp.Android.Log, 2016/10/07, remove 0x840 0x841, default value set by kernel or driver, no need to modify here
+on property:persist.sys.powerkeydump=0
+    write  /d/spmi/spmi-0/address 0x843
+    write  /d/spmi/spmi-0/data 0x00
+    write  /d/spmi/spmi-0/address 0x842
+    write  /d/spmi/spmi-0/data 0x07
+
+service ps /system/bin/sh /autochmod.sh "ps"
+    class core
+    user root
+    disabled
+    oneshot
+service top /system/bin/sh /autochmod.sh "top"
+    class core
+    user root
+    disabled
+    oneshot
+service server_list /system/bin/sh /autochmod.sh "server"
+    class core
+    user root
+    disabled
+    oneshot
+service dump_sys /system/bin/sh /autochmod.sh "dump"
+    class core
+    user root
+    disabled
+    oneshot
+service dump_state /system/bin/sh /autochmod.sh "dumpstate"
+    class core
+    user root
+    disabled
+    oneshot
+service tranfer /system/bin/sh /autochmod.sh "tranfer"
+    class core
+    user root
+    disabled
+    oneshot
+service tranfer_tomb /system/bin/sh /autochmod.sh "tranfer_tombstone"
+    class core
+    user root
+    disabled
+    oneshot
+service tranfer_anr /system/bin/sh /autochmod.sh "tranfer_anr"
+    class core
+    user root
+    disabled
+    oneshot
+service logcatsdcard /system/bin/sh /autochmod.sh "main"
+    class core
+    user root
+    disabled
+    oneshot
+service logcatradio /system/bin/sh /autochmod.sh "radio"
+    class core
+    user root
+    disabled
+    oneshot
+service logcatevent /system/bin/sh /autochmod.sh "event"
+    class core
+    user root
+    disabled
+    oneshot
+
+service dumpenvironment /system/bin/sh /autochmod.sh "dumpenvironment"
+    class core
+    user root
+    disabled
+    oneshot
+
+#ifndef VENDOR_EDIT
+#Horn@Swdp.Android.Boot_Charger Storage Power_Timer, 2015/07/03, Modify for [merge klog log into android log]
+#service logcatkernel /system/bin/sh /autochmod.sh "kernel"
+#else /* VENDOR_EDIT */
+service logcatkernel /system/bin/logwrapper /system/bin/sh /autochmod.sh "kernel"
+#endif /* VENDOR_EDIT */
+    class core
+    user root
+    disabled
+    oneshot
+
+service cleanlog /system/bin/sh /autochmod.sh "clean"
+    class core
+    user root
+    disabled
+    oneshot
+service  tcpdumplog /system/bin/sh /autochmod.sh "tcpdump"
+    class core
+    user root
+    disabled
+    oneshot
+service fingerprintlog /system/bin/sh /autochmod.sh "fingerprint"
+    class core
+    user root
+    disabled
+    oneshot
+
+service fplogqess /system/bin/sh /autochmod.sh "fpqess"
+    class core
+    user root
+    disabled
+    oneshot
+
+#ifdef VENDOR_EDIT
+#Horn@Swdp.Android.Boot, 2015/03/27, Modify for remove suid of tcpdump . suid bit will be set only when  sys.debug = 1
+service enabletcpdump /system/bin/sh /autochmod.sh "enabletcpdump"
+    class core
+    user root
+    disabled
+    oneshot
+#endif
+
+#ifdef VENDOR_EDIT
+#Canjie.Zheng@Swdp.Android.OppoDebug.LogKit, 2016/01/21
+service logpreprocess /system/bin/sh /autochmod.sh "logpreprocess"
+    class core
+    user root
+    disabled
+    oneshot
+#endif /*VENDOR_EDIT*/
+
+##ifdef VENDOR_EDIT
+#Boning.Li@Swdp.Android.OppoDebug.LogKit, 2016/08/06, add screen record for oppo log.
+service screen_record /system/bin/sh /autochmod.sh "screen_record"
+    class core
+    user root
+    disabled
+    oneshot
+#endif /*VENDOR_EDIT*/
+
+#ifdef VENDOR_EDIT
+#Yanzhen.Feng@Swdp.Android.OppoDebug.LayerDump, 2015/12/09, Add for SurfaceFlinger Layer dump
+service layerdump /system/bin/sh /autochmod.sh "layerdump"
+    class core
+    user root
+    disabled
+    oneshot
+#endif /* VENDOR_EDIT */
+
+#ifdef VENDOR_EDIT
+#Jianping.Zheng@Swdp.Android.Stability.Crash, 2016/08/09, Add for logd memory leak workaround
+service checklogdmemleak /system/bin/sh /autochmod.sh "check_logd_memleak"
+    class core
+    user root
+    disabled
+    oneshot
+#endif /* VENDOR_EDIT */
+
+#ifdef VENDOR_EDIT
+#Zhihao.Li@MultiMedia.AudioServer.FrameWork, 2016/10/19, Add for clean pcm dump file.
+service cleanpcmdump /system/bin/sh /autochmod.sh "cleanpcmdump"
+    class core
+    user root
+    disabled
+    oneshot
+#endif /* VENDOR_EDIT */
+
+service clearcurrentlog /system/bin/sh /autochmod.sh "clearcurrentlog"
+    class core
+    user root
+    disabled
+    oneshot
+
+service calcutelogsize /system/bin/sh /autochmod.sh "calcutelogsize"
+    class core
+    user root
+    disabled
+    oneshot
+
+service movescreenrecord /system/bin/sh /autochmod.sh "movescreenrecord"
+    class core
+    user root
+    disabled
+    oneshot
+
+service cleardataoppolog /system/bin/sh /autochmod.sh "cleardataoppolog"
+    class core
+    user root
+    disabled
+    oneshot
+
+service initcache /system/bin/sh /autochmod.sh "initcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service logcatcache /system/bin/sh /autochmod.sh "logcatcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service radiocache /system/bin/sh /autochmod.sh "radiocache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service eventcache /system/bin/sh /autochmod.sh "eventcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service kernelcache /system/bin/sh /autochmod.sh "kernelcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service tcpdumpcache /system/bin/sh /autochmod.sh "tcpdumpcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service fingerprintcache /system/bin/sh /autochmod.sh "fingerprintcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service fplogcache /system/bin/sh /autochmod.sh "fplogcache"
+    class core
+    user root
+    disabled
+    oneshot
+
+service log_observer /system/bin/sh /autochmod.sh "log_observer"
+    class core
+    user root
+    disabled
+    oneshot
+
+service junklogcat /system/bin/sh /autochmod.sh "junklogcat"
+    class main
+    user root
+    disabled
+    oneshot
+
+service junkdmesg /system/bin/sh /autochmod.sh "junkdmesg"
+    class main
+    user root
+    disabled
+    oneshot
+
+service junkststart /system/bin/sh /autochmod.sh "junkststart"
+    class main
+    user root
+    disabled
+    oneshot
+
+service junkststop /system/bin/sh /autochmod.sh "junkststop"
+    class main
+    user root
+    disabled
+    oneshot
+
+#ifdef VENDOR_EDIT
+#Canjie.Zheng@Swdp.Android.OppoDebug.LogKit, 2016/09/13, add for copy pstore
+service cppstore /system/bin/sh /autochmod.sh "cppstore"
+    class main
+    user root
+    disabled
+    oneshot
+#endif  VENDOR_EDIT
+#ifdef VENDOR_EDIT
+#Canjie.Zheng@Swdp.Android.OppoDebug.JunkLog, 2016/08/04, add for junk log.
+service junklog /system/bin/junklogcollector
+    class main
+    user system
+    group system sdcard_rw sdcard_r
+    seclabel u:r:junklog:s0
+
+#endif /* VENDOR_EDIT */
+
+on post-fs-data
+   mkdir /data/oppo_log 777
+
+on property:persist.sys.assert.panic=true
+   start initcache
+   start logpreprocess
+   start log_observer
+
+on property:sys.oppo.collectcache.start=true
+   start logcatcache
+   start radiocache
+   start eventcache
+   start kernelcache
+   start tcpdumpcache
+   start fingerprintcache
+   start fplogcache
+
+on property:sys.oppo.collectlog.start=true
+   start logcatsdcard
+   start logcatradio
+   start logcatevent
+   start logcatkernel
+   start tcpdumplog
+   start fingerprintlog
+   start fplogqess
+   start cppstore
+#ifdef VENDOR_EDIT
+#Canjie.Zheng@Swdp.Android.OppoDebug.JunkLog,2016/07/25,add for junklog
+#start or stop base on the property
+on property:persist.sys.oppo.junklog=true
+    start junklog
+
+on property:persist.sys.oppo.junklog=false
+    start junklog
+#endif VENDOR_EDIT

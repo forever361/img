@@ -1,0 +1,18 @@
+subsystem adf
+	devname uevent_devname
+
+#This file is for MSM8952 16037 platform.
+#ifdef VENDOR_EDIT
+#RunSheng.Pei@Swd.Android.BaseConfig, 2016/08/30, add for different platforms's reserve partition permission config:
+
+#ifdef VENDOR_EDIT
+#Canjie.Zheng@Swdp.Android.OppoDebug.CriticalLog, 2016/01/20, add for critical log
+/dev/block/bootdevice/by-name/reserve2               0660   system     system
+/dev/block/mmcblk0p51   0660   system     system
+#endif /*VENDOR_EDIT*/
+
+#ifdef VENDOR_EDIT
+#Runsheng.Pei@Swdp.Android.OppoFeature.UsageRecord, 2014/07/30, add provide a function to indentify the usage of the phone.
+/dev/block/bootdevice/by-name/reserve4               0660   system     system
+/dev/block/mmcblk0p53   0660    system  system
+#endif /*VENDOR_EDIT*/

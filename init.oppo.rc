@@ -1,0 +1,156 @@
+##################################################################################
+### VENDOR_EDIT, OPPO All rights reserved.
+###
+### File: - init.oppo.rc
+### Author: jiangyg@PM
+###
+### ------------------------------- Revision History: ----------------------------
+### <author>                        <data>       <version>   <desc>
+### ------------------------------------------------------------------------------
+### jiangyg@PM                     2013-10-21                Create this file
+##################################################################################
+#ifdef VENDOR_EDIT
+#Wei.Wang@Swdp.Android.Storage, 2014/03/12, add for init rc
+import init.oppo.init.rc
+#endif
+
+#ifdef VENDOR_EDIT
+#JianRong.Zheng@Swdp.Android.EngineeringMode, 2016/10/01, add for init engineermode rc
+import init.oppo.engineermode.rc
+#endif
+
+#ifdef VENDOR_EDIT
+#Haoran.Zhang@Swdp.Android.BuildConfig.BaseConfig, 2016/09/22, add for protect xkit
+on init
+   export XKIT /system/xbin/xkit_10
+#endif
+
+#ifdef VENDOR_EDIT
+#Wei.Wang@Swdp.Android.Storage, 2016/06/30, add for support /storage/sdcard0
+on post-fs-data
+  symlink /storage/self/primary /storage/sdcard0
+#endif
+
+    # ifndef VENDOR_EDIT
+    # GuoBin.Luo@Swdp.Android.Package.GoogleResource, 2016/09/06, add for inner google resources
+    mkdir /data/gr 0771 system system
+    chown system system /data/gr/138e8af41c2a62b4c06adf65577772419.gr
+    chown system system /data/gr/290aa18407779e8f44cb57733d3b5ea23.gr
+    chown system system /data/gr/3b64e23f2e4cdf5b109c52f30b37cdcb5.gr
+    chown system system /data/gr/4f20989b475c563b80c11b18a5c02b457.gr
+    chown system system /data/gr/5010a28878517c105a60f155f0c6f5c56.gr
+    chown system system /data/gr/6f8acd492101e6b11f5eadcc188566ae1.gr
+    #endif
+
+#ifdef VENDOR_EDIT
+#WeiHong.Li@Mobile.Network, 2015/09/11, Add suid_dumpable to capture rild's tombstone according to case 02090380
+#Zhengpeng@OnLineRD.AirService.RIL, 2013/11/4, Add for create opponvitems dir
+#Haitao.Zhou@BSP.Fingerprint.Secure, 2016/07/13, Add for creat rpmb_status floder in persist
+#zhunn@OnLineRD.AirService.RIL, 2015/1/28, Add for cdma card cannot send sms in Yiwu
+on boot
+	mkdir /data/opponvitems  0771 radio radio
+	write /proc/sys/fs/suid_dumpable 1
+	mkdir /persist/rpmb_status
+	chmod 0777 /persist/rpmb_status
+    setprop persist.radio.force_on_dc true
+
+#endif
+
+#ifdef VENDOR_EDIT
+#Haitao.Zhou@BSP.Fingerprint.Payment, 2016/08/27, Add alipay service
+service alipayservice /system/bin/alipayservice
+    class late_start
+    user system
+    group system
+#endif /* VENDOR_EDIT */
+
+#Wei.He@Swdp.Android.Boot.Bootanimation, 2014/08/05, modify for oppo startup & shutdown animation
+service bootanim /system/bin/bootanimation
+    class core
+    user root
+    group media graphics audio
+    disabled
+    oneshot
+service rbootanim /system/bin/bootanimation -r
+    class core
+    user root
+    group graphics audio media
+    disabled
+    oneshot
+#endif /* VENDOR_EDIT */
+
+# ifdef VENDOR_EDIT
+#WeiHong.Li@Mobile.Network, 2015/09/11, disalbe suid_dumpable if release_type=true to pass cts test
+on property:ro.build.release_type=true
+    write /proc/sys/fs/suid_dumpable 0
+
+# ifdef VENDOR_EDIT
+#fangpan@Swdp.shanghai, 2015/12/20, enable the procmod.ko when boot up
+on property:persist.sys.procmon_enable=1
+    insmod /system/lib/modules/procmon.ko -f
+    chown root system /sys/module/procmon/parameters/cpuload_thresh
+    chown root system /sys/module/procmon/parameters/io_thresh
+    chown root system /sys/module/procmon/parameters/mem_thresh
+    chown root system /sys/module/procmon/parameters/binder_thresh
+    chown root system /sys/module/procmon/parameters/trigger_time
+    chown root system /sys/module/procmon/parameters/enable
+# endif /* VENDOR_EDIT */
+
+#ifdef VENDOR_EDIT
+#PengNan@Mobile.BSP.CHG 2016.1.16 add for otg_switch
+on property:persist.sys.oppo.otg_support=true
+	write /sys/class/power_supply/usb/otg_switch 1
+
+on property:persist.sys.oppo.otg_support=false
+	write /sys/class/power_supply/usb/otg_switch 0
+#endif /* VENDOR_EDIT */
+
+#ifdef VENDOR_EDIT
+#Jianping.Zheng@Swdp.Android.Stability.Crash, 2015/11/06, Add for open print_system_murder feature in non release version
+on property:ro.secure=0
+    write /proc/sys/kernel/print_fatal_murder 1
+#endif
+
+#ifdef VENDOR_EDIT yixue.ge add for bsp criticallog
+service bspCriticalLog /system/bin/bspCriticalLog
+    user system
+    group system
+    class main
+#endif
+#ifdef VENDOR_EDIT
+#Ziqing.GUO@Mobile.BSP.FINGERPRINT, 2016/01/16, Add for fingerprint
+service fpc1020_sh /system/bin/sh /init.oppo.fingerprints.sh
+    class main
+    user root
+    oneshot
+#endif
+
+#ifdef VENDOR_EDIT
+#jie.cheng@Swdp.Android 2015/10/26, add for run the init.oppo.hypnus.sh on property
+service hypnus_context /system/bin/sh /system/etc/init.oppo.hypnus.sh
+    user root
+    disabled
+    oneshot
+
+on property:sys.enable.hypnus=*
+    start hypnus_context
+
+#yan.chen@swdp.shanghai 2016/07/25, add property control for hypnus logging
+service hypnus_logging /system/bin/sh /system/etc/init.oppo.hypnus_logging.sh
+    user root
+    disabled
+    oneshot
+
+on property:persist.sys.oppo.junklog=*
+    start hypnus_logging
+#endif
+
+
+#ifdef VENDOR_EDIT
+#Bin.Yan@Swap.Android.BuildConfig.BaseConfig, 2016/06/15, add for support root on optrtest
+# Restart adbd so it can run as root
+on property:service.adb.root=1
+    write /sys/class/android_usb/android0/enable 0
+    restart adbd
+    write /sys/class/android_usb/android0/enable 1
+

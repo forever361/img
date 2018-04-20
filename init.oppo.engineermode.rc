@@ -1,0 +1,40 @@
+#ifndef VENDOR_EDIT
+#Yang.Li@Swdp.Android.Power, 2014/12/10, Add for
+on property:sys.engineermode.chargeswitch=true
+write /sys/class/power_supply/battery/mmi_charging_enable 1
+
+on property:sys.engineermode.chargeswitch=false
+write /sys/class/power_supply/battery/mmi_charging_enable 0
+#endif /* VENDOR_EDIT */
+
+
+#ifdef VENDOR_EDIT
+#JianRong.Zheng@Swdp.Android.EngineeringMode, 2014/07/21, Add for
+service engineermode-sh /system/bin/sh /init.oppo.engineermode.sh
+    class late_start
+    user root
+    oneshot
+
+service wifisocket /system/bin/sh -c "diag_socket_log -a 181.157.1.200 -p 2500 -r 10000"
+    user root
+    disabled
+    oneshot
+
+service opposysd /system/bin/oppo-system-daemon
+    class main
+    user root
+    group root qcom_diag
+    disabled
+
+on property:service.wifi.socket.enable=1
+    start opposysd
+    start wifisocket
+
+on property:service.wifi.socket.enable=0
+    stop opposysd
+    stop wifisocket
+#endif /* VENDOR_EDIT */
+
+#JianRong.Zheng@Swdp.Android.EngineeringMode, 2014/07/21, Add for record engineermode test result
+on post-fs-data
+    mkdir /data/engineermode 0775 system system

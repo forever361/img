@@ -1,0 +1,22 @@
+service zygote /system/bin/app_process64 -Xzygote /system/bin --zygote --start-system-server --socket-name=zygote
+    class main
+    socket zygote stream 660 root system
+    onrestart write /sys/android_power/request_state wake
+    onrestart write /sys/power/state on
+    onrestart restart media
+    onrestart restart netd
+    writepid /dev/cpuset/foreground/tasks
+#ifdef VENDOR_EDIT
+#Jianhua.Sun@Swdp.Android.Charge.QuickBoot, 2016/06/06, modify for quickboot
+    disabled
+#endif /* VENDOR_EDIT */
+
+service zygote_secondary /system/bin/app_process32 -Xzygote /system/bin --zygote --socket-name=zygote_secondary
+    class main
+    socket zygote_secondary stream 660 root system
+    onrestart restart zygote
+    writepid /dev/cpuset/foreground/tasks
+#ifdef VENDOR_EDIT 
+#Jianhua.Sun@Swdp.Android.Charge.QuickBoot, 2016/06/06, modify for quickboot
+    disabled
+#endif /* VENDOR_EDIT */
