@@ -10,7 +10,6 @@ import /init.${ro.hardware}.rc
 import /init.usb.configfs.rc
 import /init.${ro.zygote}.rc
 import /init.trace.rc
-import init.supersu.rc
 #ifdef VENDOR_EDIT
 #Canjie.Zheng@Swdp.Android.OppoDebug.LogKit, add for adddevdiag,2016/03/18
 import init.oppo.debug.diag.rc
@@ -411,6 +410,7 @@ on post-fs-data
     setusercryptopolicies /data/user
 
     # Reload policy from /data/security if present.
+    setprop selinux.reload_policy 1
 
     # Set SELinux security contexts on upgrade or policy update.
     restorecon_recursive /data
@@ -958,5 +958,3 @@ service fingerprintd /system/bin/fingerprintd
     user system
     group system sdcard_rw sdcard_r
 #endif /* VENDOR_EDIT */
-# SuperSU:PATCH:279
-# SuperSU:STOCK:1b0f6193bd1a10d229664130b31f304798eb9f8f

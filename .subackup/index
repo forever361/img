@@ -1,0 +1,16 @@
++ .sufrp
++ .sufrp/file_contexts_image
++ .sufrp/frp_install
++ .sufrp/libsupol.so
++ .sufrp/su
++ .sufrp/sukernel
++ .sufrp/supolicy
++ init.supersu.rc
++ sbin/launch_daemonsu.sh
++ su
+* file_contexts 0000_file_contexts
+* fstab.qcom 0001_fstab.qcom
+* init.environ.rc 0002_init.environ.rc
+* init.rc 0003_init.rc
+* sepolicy 0004_sepolicy
+- verity_key 0005_verity_key
